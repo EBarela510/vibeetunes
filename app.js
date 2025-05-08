@@ -23,9 +23,10 @@ const playlistSchema = new mongoose.Schema({
 });
 const Playlist = mongoose.model('Playlist', playlistSchema);
 
-// Add mood + song
+// Add mood + song (normalize mood to lowercase)
 app.post('/api/playlists', async (req, res) => {
-    const { mood, song } = req.body;
+    const mood = req.body.mood.trim().toLowerCase();
+    const song = req.body.song.trim();
     if (!mood || !song) return res.status(400).json({ error: 'Mood and song are required.' });
     try {
         const newEntry = new Playlist({ mood, song });
@@ -37,21 +38,21 @@ app.post('/api/playlists', async (req, res) => {
 });
 
 // Get all songs
-app.get('/api/playlists/:mood', async (req, res) => {
+app.get('/api/playlists', async (req, res) => {
     try {
-        const entries = await Playlist.find({
-            mood: { $regex: new RegExp(`^${req.params.mood}$`, 'i') }
-        });
+        const entries = await Playlist.find();
         res.json(entries);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Get songs by mood
+// Get songs by mood (case-insensitive search)
 app.get('/api/playlists/:mood', async (req, res) => {
     try {
-        const entries = await Playlist.find({ mood: req.params.mood });
+        const entries = await Playlist.find({
+            mood: { $regex: new RegExp(`^${req.params.mood}$`, 'i') }
+        });
         res.json(entries);
     } catch (err) {
         res.status(500).json({ error: err.message });

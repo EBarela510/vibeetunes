@@ -56,12 +56,20 @@
             renderList(entries);
         }
 
+        async function deleteSong(id) {
+            await fetch(`/api/playlists/${id}`, { method: 'DELETE' });
+            fetchAllSongs();
+        }
+
         function renderList(entries) {
             const list = document.getElementById('playlistList');
             list.innerHTML = '';
             entries.forEach(entry => {
                 const li = document.createElement('li');
-                li.textContent = `${entry.mood}: ${entry.song}`;
+                li.innerHTML = `
+                    <span>${entry.mood}: ${entry.song}</span>
+                    <button class="delete-btn" onclick="deleteSong('${entry._id}')">❌</button>
+                `;
                 list.appendChild(li);
             });
         }

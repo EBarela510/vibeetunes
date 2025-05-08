@@ -56,6 +56,16 @@ app.get('/api/playlists/:mood', async (req, res) => {
     }
 });
 
+// Delete song by ID
+app.delete('/api/playlists/:id', async (req, res) => {
+    try {
+        await Playlist.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Song deleted' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Serve frontend
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

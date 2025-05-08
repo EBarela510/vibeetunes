@@ -7,6 +7,9 @@
 </head>
 <body>
     <h1>🎵 VibeeTunes: Mood-Based Playlist Maker 🎶</h1>
+
+    <!-- Get Playlist Section -->
+    <h2>Get Playlist</h2>
     <select id="moodSelect">
         <option value="">-- Select your mood --</option>
         <option value="happy">Happy</option>
@@ -15,8 +18,24 @@
         <option value="angry">Angry</option>
     </select>
     <button onclick="getPlaylists()">Get Playlist</button>
-
     <ul id="playlist"></ul>
+
+    <!-- Create Playlist Section -->
+    <h2>Create Playlist</h2>
+    <input type="text" id="newMood" placeholder="Mood (e.g., happy)">
+    <input type="text" id="newSongs" placeholder="Songs (comma separated)">
+    <button onclick="createPlaylist()">Create Playlist</button>
+
+    <!-- Update Playlist Section -->
+    <h2>Update Playlist</h2>
+    <input type="text" id="updateMood" placeholder="Mood to update">
+    <input type="text" id="updateSongs" placeholder="New songs (comma separated)">
+    <button onclick="updatePlaylist()">Update Playlist</button>
+
+    <!-- Delete Playlist Section -->
+    <h2>Delete Playlist</h2>
+    <input type="text" id="deleteMood" placeholder="Mood to delete">
+    <button onclick="deletePlaylist()">Delete Playlist</button>
 
     <script src="app.js"></script>
 </body>

@@ -27,3 +27,27 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
+// Update playlist by mood
+router.put('/:mood', async (req, res) => {
+    try {
+        const updated = await Playlist.findOneAndUpdate(
+            { mood: req.params.mood },
+            { songs: req.body.songs },
+            { new: true }
+        );
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Delete playlist by mood
+router.delete('/:mood', async (req, res) => {
+    try {
+        await Playlist.findOneAndDelete({ mood: req.params.mood });
+        res.json({ message: 'Playlist deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});

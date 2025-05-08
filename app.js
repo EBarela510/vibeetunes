@@ -1,94 +1,87 @@
-const API_BASE = '';
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
 
-function showMessage(msg, type = 'success') {
-    const messageEl = document.getElementById('message');
-    messageEl.textContent = msg;
-    messageEl.className = type;
-    setTimeout(() => messageEl.textContent = '', 3000);
-}
+const app = express();
 
-async function getPlaylists() {
-    const mood = document.getElementById('moodSelect').value;
-    if (!mood) return showMessage('Please select a mood.', 'error');
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// Import Playlist model
+const Playlist = require('./models/Playlist');
+
+// Routes
+
+// Get playlists by mood
+app.get('/api/playlists/:mood', async (req, res) => {
     try {
-        const res = await fetch(`${API_BASE}/api/playlists/${mood}`);
-        if (!res.ok) throw new Error('Failed to fetch playlists');
-        const playlists = await res.json();
+        const playlists = await Playlist.find({ mood: req.params.mood });
+        res.json(playlists);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
-        const playlistEl = document.getElementById('playlist');
-        playlistEl.innerHTML = '';
+// Create playlist
+app.post('/api/playlists', async (req, res) => {
+    const playlist = new Playlist({
+        mood: req.body.mood,
+        songs: req.body.songs
+    });
+    try {
+        const newPlaylist = await playlist.save();
+        res.status(201).json(newPlaylist);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
 
-        if (playlists.length === 0) {
-            playlistEl.innerHTML = '<li>No playlists found for this mood.</li>';
-            return;
+// Update playlist by mood
+app.put('/api/playlists/:mood', async (req, res) => {
+    try {
+        const updatedPlaylist = await Playlist.findOneAndUpdate(
+            { mood: req.params.mood },
+            { songs: req.body.songs },
+            { new: true }
+        );
+        if (!updatedPlaylist) {
+            return res.status(404).json({ message: 'Playlist not found' });
         }
-
-        playlists.forEach(p => {
-            const li = document.createElement('li');
-            li.textContent = `${p.mood.toUpperCase()}: ${p.songs.join(', ')}`;
-            playlistEl.appendChild(li);
-        });
+        res.json(updatedPlaylist);
     } catch (err) {
-        showMessage('Error loading playlists. Check server.', 'error');
+        res.status(500).json({ message: err.message });
     }
-}
+});
 
-async function createPlaylist() {
-    const mood = document.getElementById('newMood').value;
-    const songs = document.getElementById('newSongs').value.split(',').map(s => s.trim());
-    if (!mood || songs.length === 0) return showMessage('Please enter mood and songs.', 'error');
-
+// Delete playlist by mood
+app.delete('/api/playlists/:mood', async (req, res) => {
     try {
-        const res = await fetch(`${API_BASE}/api/playlists`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mood, songs })
-        });
-        if (!res.ok) throw new Error('Failed to create playlist');
-        showMessage('Playlist created!');
-        document.getElementById('newMood').value = '';
-        document.getElementById('newSongs').value = '';
-        getPlaylists();
+        const deletedPlaylist = await Playlist.findOneAndDelete({ mood: req.params.mood });
+        if (!deletedPlaylist) {
+            return res.status(404).json({ message: 'Playlist not found' });
+        }
+        res.json({ message: 'Playlist deleted' });
     } catch (err) {
-        showMessage('Error creating playlist.', 'error');
+        res.status(500).json({ message: err.message });
     }
-}
+});
 
-async function updatePlaylist() {
-    const mood = document.getElementById('updateMood').value;
-    const songs = document.getElementById('updateSongs').value.split(',').map(s => s.trim());
-    if (!mood || songs.length === 0) return showMessage('Please enter mood and new songs.', 'error');
+// Serve frontend (optional, if you want / to load index.html)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-    try {
-        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ songs })
-        });
-        if (!res.ok) throw new Error('Failed to update playlist');
-        showMessage('Playlist updated!');
-        document.getElementById('updateMood').value = '';
-        document.getElementById('updateSongs').value = '';
-        getPlaylists();
-    } catch (err) {
-        showMessage('Error updating playlist.', 'error');
-    }
-}
-
-async function deletePlaylist() {
-    const mood = document.getElementById('deleteMood').value;
-    if (!mood) return showMessage('Please enter mood to delete.', 'error');
-
-    try {
-        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
-            method: 'DELETE'
-        });
-        if (!res.ok) throw new Error('Failed to delete playlist');
-        showMessage('Playlist deleted!');
-        document.getElementById('deleteMood').value = '';
-        getPlaylists();
-    } catch (err) {
-        showMessage('Error deleting playlist.', 'error');
-    }
-}
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

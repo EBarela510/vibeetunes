@@ -11,22 +11,27 @@ async function getPlaylists() {
     const mood = document.getElementById('moodSelect').value;
     if (!mood) return showMessage('Please select a mood.', 'error');
 
-    const res = await fetch(`${API_BASE}/api/playlists/${mood}`);
-    const playlists = await res.json();
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`);
+        if (!res.ok) throw new Error('Failed to fetch playlists');
+        const playlists = await res.json();
 
-    const playlistEl = document.getElementById('playlist');
-    playlistEl.innerHTML = '';
+        const playlistEl = document.getElementById('playlist');
+        playlistEl.innerHTML = '';
 
-    if (playlists.length === 0) {
-        playlistEl.innerHTML = '<li>No playlists found for this mood.</li>';
-        return;
+        if (playlists.length === 0) {
+            playlistEl.innerHTML = '<li>No playlists found for this mood.</li>';
+            return;
+        }
+
+        playlists.forEach(p => {
+            const li = document.createElement('li');
+            li.textContent = `${p.mood.toUpperCase()}: ${p.songs.join(', ')}`;
+            playlistEl.appendChild(li);
+        });
+    } catch (err) {
+        showMessage('Error loading playlists. Check server.', 'error');
     }
-
-    playlists.forEach(p => {
-        const li = document.createElement('li');
-        li.textContent = `${p.mood.toUpperCase()}: ${p.songs.join(', ')}`;
-        playlistEl.appendChild(li);
-    });
 }
 
 async function createPlaylist() {
@@ -34,16 +39,20 @@ async function createPlaylist() {
     const songs = document.getElementById('newSongs').value.split(',').map(s => s.trim());
     if (!mood || songs.length === 0) return showMessage('Please enter mood and songs.', 'error');
 
-    await fetch(`${API_BASE}/api/playlists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood, songs })
-    });
-
-    showMessage('Playlist created!');
-    document.getElementById('newMood').value = '';
-    document.getElementById('newSongs').value = '';
-    getPlaylists();
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mood, songs })
+        });
+        if (!res.ok) throw new Error('Failed to create playlist');
+        showMessage('Playlist created!');
+        document.getElementById('newMood').value = '';
+        document.getElementById('newSongs').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error creating playlist.', 'error');
+    }
 }
 
 async function updatePlaylist() {
@@ -51,27 +60,35 @@ async function updatePlaylist() {
     const songs = document.getElementById('updateSongs').value.split(',').map(s => s.trim());
     if (!mood || songs.length === 0) return showMessage('Please enter mood and new songs.', 'error');
 
-    await fetch(`${API_BASE}/api/playlists/${mood}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ songs })
-    });
-
-    showMessage('Playlist updated!');
-    document.getElementById('updateMood').value = '';
-    document.getElementById('updateSongs').value = '';
-    getPlaylists();
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ songs })
+        });
+        if (!res.ok) throw new Error('Failed to update playlist');
+        showMessage('Playlist updated!');
+        document.getElementById('updateMood').value = '';
+        document.getElementById('updateSongs').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error updating playlist.', 'error');
+    }
 }
 
 async function deletePlaylist() {
     const mood = document.getElementById('deleteMood').value;
     if (!mood) return showMessage('Please enter mood to delete.', 'error');
 
-    await fetch(`${API_BASE}/api/playlists/${mood}`, {
-        method: 'DELETE'
-    });
-
-    showMessage('Playlist deleted!');
-    document.getElementById('deleteMood').value = '';
-    getPlaylists();
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
+            method: 'DELETE'
+        });
+        if (!res.ok) throw new Error('Failed to delete playlist');
+        showMessage('Playlist deleted!');
+        document.getElementById('deleteMood').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error deleting playlist.', 'error');
+    }
 }

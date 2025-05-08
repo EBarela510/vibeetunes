@@ -37,9 +37,11 @@ app.post('/api/playlists', async (req, res) => {
 });
 
 // Get all songs
-app.get('/api/playlists', async (req, res) => {
+app.get('/api/playlists/:mood', async (req, res) => {
     try {
-        const entries = await Playlist.find();
+        const entries = await Playlist.find({
+            mood: { $regex: new RegExp(`^${req.params.mood}$`, 'i') }
+        });
         res.json(entries);
     } catch (err) {
         res.status(500).json({ error: err.message });

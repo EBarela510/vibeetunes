@@ -8,9 +8,17 @@ body {
 }
 
 h1 {
-    font-size: 2.5em;
+    font-size: 3em;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+.form-section {
+    margin: 15px 0;
 }
 
 input, button {
@@ -30,29 +38,11 @@ button {
     background: #ff416c;
     color: #fff;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
     background: #ff4b2b;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: rgba(255, 255, 255, 0.2);
-    margin: 10px auto;
-    padding: 10px;
-    width: 80%;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
-}
-
-li:hover {
     transform: scale(1.05);
 }
 
@@ -63,4 +53,25 @@ li:hover {
     border-radius: 15px;
     margin: 20px auto;
     width: 80%;
+    padding: 10px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background: rgba(255, 255, 255, 0.3);
+    margin: 10px auto;
+    padding: 10px;
+    width: 90%;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+li:hover {
+    transform: scale(1.03);
 }

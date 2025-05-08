@@ -6,8 +6,6 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-
-// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -23,10 +21,7 @@ const playlistSchema = new mongoose.Schema({
     song: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
-
 const Playlist = mongoose.model('Playlist', playlistSchema);
-
-// Routes
 
 // Add mood + song
 app.post('/api/playlists', async (req, res) => {
@@ -41,7 +36,17 @@ app.post('/api/playlists', async (req, res) => {
     }
 });
 
-// Get all songs by mood
+// Get all songs
+app.get('/api/playlists', async (req, res) => {
+    try {
+        const entries = await Playlist.find();
+        res.json(entries);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get songs by mood
 app.get('/api/playlists/:mood', async (req, res) => {
     try {
         const entries = await Playlist.find({ mood: req.params.mood });
@@ -51,11 +56,10 @@ app.get('/api/playlists/:mood', async (req, res) => {
     }
 });
 
-// Serve index.html
+// Serve frontend
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

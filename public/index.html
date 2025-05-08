@@ -1,22 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vibeetunes Playlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
     <h1>🎵 Vibeetunes Playlist 🎶</h1>
 
-    <!-- Add section -->
-    <input type="text" id="moodInput" placeholder="Mood (e.g., Happy)">
-    <input type="text" id="songInput" placeholder="Song name">
-    <button onclick="addPlaylist()">Add Song</button>
+    <div class="form-section">
+        <input type="text" id="moodInput" placeholder="Mood (e.g., Happy)">
+        <input type="text" id="songInput" placeholder="Song name">
+        <button onclick="addPlaylist()">Add Song</button>
+    </div>
 
-    <!-- Retrieve section -->
-    <input type="text" id="searchMoodInput" placeholder="Search mood">
-    <button onclick="searchMood()">Retrieve Songs</button>
+    <div class="form-section">
+        <input type="text" id="searchMoodInput" placeholder="Search mood">
+        <button onclick="searchMood()">Retrieve Songs</button>
+    </div>
 
-    <!-- Scrollable list -->
-    <h2>Results:</h2>
-    <div id="resultsContainer" style="max-height: 300px; overflow-y: scroll; border: 1px solid #fff; padding: 10px;">
+    <h2>🎶 Current Playlist 🎶</h2>
+    <div id="resultsContainer">
         <ul id="playlistList"></ul>
     </div>
 
     <script>
+        async function fetchAllSongs() {
+            const res = await fetch('/api/playlists');
+            const entries = await res.json();
+            renderList(entries);
+        }
+
         async function addPlaylist() {
             const mood = document.getElementById('moodInput').value.trim();
             const song = document.getElementById('songInput').value.trim();
@@ -30,7 +44,7 @@
 
             document.getElementById('moodInput').value = '';
             document.getElementById('songInput').value = '';
-            alert('Song added!');
+            fetchAllSongs();
         }
 
         async function searchMood() {
@@ -39,6 +53,10 @@
 
             const res = await fetch(`/api/playlists/${mood}`);
             const entries = await res.json();
+            renderList(entries);
+        }
+
+        function renderList(entries) {
             const list = document.getElementById('playlistList');
             list.innerHTML = '';
             entries.forEach(entry => {
@@ -47,5 +65,8 @@
                 list.appendChild(li);
             });
         }
+
+        window.onload = fetchAllSongs;
     </script>
 </body>
+</html>

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const playlistSchema = new mongoose.Schema({
-    mood: String,
+    mood: { type: String, required: true },
     songs: [String],
-    createdAt: { type: Date, default: Date.now }
-});
+    description: { type: String, default: '' }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Playlist', playlistSchema);

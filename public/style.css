@@ -1,9 +1,9 @@
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
     background: linear-gradient(to right, #6a11cb, #2575fc);
     color: white;
+    text-align: center;
+    padding: 20px;
 }
 
 h1 {
@@ -11,28 +11,35 @@ h1 {
     margin-bottom: 20px;
 }
 
-h2 {
-    margin-top: 30px;
+section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 input, select, button {
     padding: 10px;
     margin: 5px;
-    font-size: 1em;
-    border-radius: 10px;
+    border-radius: 5px;
     border: none;
+    font-size: 1em;
 }
 
 button {
-    background-color: #fff;
+    background: white;
     color: #2575fc;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, color 0.3s;
 }
 
 button:hover {
-    background-color: #2575fc;
-    color: #fff;
+    background: #2575fc;
+    color: white;
 }
 
 ul {
@@ -44,6 +51,19 @@ li {
     background: rgba(255, 255, 255, 0.2);
     margin: 5px auto;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     max-width: 400px;
+}
+
+#message {
+    margin: 10px;
+    font-weight: bold;
+}
+
+#message.success {
+    color: lightgreen;
+}
+
+#message.error {
+    color: pink;
 }

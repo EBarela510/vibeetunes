@@ -6,36 +6,47 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>🎵 VibeeTunes: Mood-Based Playlist Maker 🎶</h1>
+    <h1>🎵 VibeeTunes</h1>
+
+    <!-- Message Display -->
+    <div id="message"></div>
 
     <!-- Get Playlist Section -->
-    <h2>Get Playlist</h2>
-    <select id="moodSelect">
-        <option value="">-- Select your mood --</option>
-        <option value="happy">Happy</option>
-        <option value="sad">Sad</option>
-        <option value="calm">Calm</option>
-        <option value="angry">Angry</option>
-    </select>
-    <button onclick="getPlaylists()">Get Playlist</button>
-    <ul id="playlist"></ul>
+    <section>
+        <h2>Get Playlist</h2>
+        <select id="moodSelect">
+            <option value="">-- Select mood --</option>
+            <option value="happy">Happy</option>
+            <option value="sad">Sad</option>
+            <option value="calm">Calm</option>
+            <option value="angry">Angry</option>
+        </select>
+        <button onclick="getPlaylists()">Get Songs</button>
+        <ul id="playlist"></ul>
+    </section>
 
     <!-- Create Playlist Section -->
-    <h2>Create Playlist</h2>
-    <input type="text" id="newMood" placeholder="Mood (e.g., happy)">
-    <input type="text" id="newSongs" placeholder="Songs (comma separated)">
-    <button onclick="createPlaylist()">Create Playlist</button>
+    <section>
+        <h2>Create Playlist</h2>
+        <input type="text" id="newMood" placeholder="Mood">
+        <input type="text" id="newSongs" placeholder="Songs (comma separated)">
+        <button onclick="createPlaylist()">Add</button>
+    </section>
 
     <!-- Update Playlist Section -->
-    <h2>Update Playlist</h2>
-    <input type="text" id="updateMood" placeholder="Mood to update">
-    <input type="text" id="updateSongs" placeholder="New songs (comma separated)">
-    <button onclick="updatePlaylist()">Update Playlist</button>
+    <section>
+        <h2>Update Playlist</h2>
+        <input type="text" id="updateMood" placeholder="Mood to update">
+        <input type="text" id="updateSongs" placeholder="New songs (comma separated)">
+        <button onclick="updatePlaylist()">Update</button>
+    </section>
 
     <!-- Delete Playlist Section -->
-    <h2>Delete Playlist</h2>
-    <input type="text" id="deleteMood" placeholder="Mood to delete">
-    <button onclick="deletePlaylist()">Delete Playlist</button>
+    <section>
+        <h2>Delete Playlist</h2>
+        <input type="text" id="deleteMood" placeholder="Mood to delete">
+        <button onclick="deletePlaylist()">Delete</button>
+    </section>
 
     <script src="app.js"></script>
 </body>

@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+select, button {
+    padding: 10px;
+    margin: 10px;
+    font-size: 1em;
+    border-radius: 10px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: rgba(255, 255, 255, 0.2);
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+}

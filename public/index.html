@@ -2,54 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VibeeTunes 🎵</title>
+    <title>VibeeTunes 🎵 Add Playlist</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🎵 VibeeTunes</h1>
-        <p class="subtitle">Create, view, and manage playlists by mood</p>
+        <h1>🎵 VibeeTunes: Add Playlist</h1>
+        <div id="message"></div>
 
-        <div id="message" class="message"></div>
+        <input type="text" id="newMood" placeholder="Mood">
+        <input type="text" id="newSongs" placeholder="Songs (comma separated)">
+        <button onclick="createPlaylist()">Add Playlist</button>
 
-        <!-- Get Playlist Section -->
-        <section class="card">
-            <h2>🎧 Get Playlist</h2>
-            <select id="moodSelect">
-                <option value="">-- Select mood --</option>
-                <option value="happy">Happy</option>
-                <option value="sad">Sad</option>
-                <option value="calm">Calm</option>
-                <option value="angry">Angry</option>
-            </select>
-            <button onclick="getPlaylists()">Get Songs</button>
-            <ul id="playlist" class="playlist"></ul>
-        </section>
-
-        <!-- Create Playlist Section -->
-        <section class="card">
-            <h2>➕ Create Playlist</h2>
-            <input type="text" id="newMood" placeholder="Mood">
-            <input type="text" id="newSongs" placeholder="Songs (comma separated)">
-            <button onclick="createPlaylist()">Add Playlist</button>
-        </section>
-
-        <!-- Update Playlist Section -->
-        <section class="card">
-            <h2>✏️ Update Playlist</h2>
-            <input type="text" id="updateMood" placeholder="Mood to update">
-            <input type="text" id="updateSongs" placeholder="New songs (comma separated)">
-            <button onclick="updatePlaylist()">Update Playlist</button>
-        </section>
-
-        <!-- Delete Playlist Section -->
-        <section class="card">
-            <h2>🗑️ Delete Playlist</h2>
-            <input type="text" id="deleteMood" placeholder="Mood to delete">
-            <button onclick="deletePlaylist()">Delete Playlist</button>
-        </section>
+        <br><br>
+        <a href="list.html">➡️ View All Playlists</a>
     </div>
 
-    <script src="/app.js"></script>
+    <script>
+        async function createPlaylist() {
+            const mood = document.getElementById('newMood').value.trim();
+            const songsInput = document.getElementById('newSongs').value.trim();
+            const songs = songsInput.split(',').map(s => s.trim());
+            if (!mood || !songsInput) return alert('Please enter mood and songs.');
+
+            try {
+                const res = await fetch('/api/playlists', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mood, songs })
+                });
+                if (!res.ok) throw new Error('Failed to create playlist');
+                alert('✅ Playlist added!');
+                document.getElementById('newMood').value = '';
+                document.getElementById('newSongs').value = '';
+            } catch (err) {
+                alert('❌ Error creating playlist');
+            }
+        }
+    </script>
 </body>
 </html>

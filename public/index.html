@@ -1,45 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vibeetunes Playlist</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
     <h1>🎵 Vibeetunes Playlist 🎶</h1>
 
+    <!-- Add section -->
     <input type="text" id="moodInput" placeholder="Mood (e.g., Happy)">
-    <input type="text" id="songsInput" placeholder="Songs (comma-separated)">
-    <button onclick="addPlaylist()">Add Playlist</button>
+    <input type="text" id="songInput" placeholder="Song name">
+    <button onclick="addPlaylist()">Add Song</button>
 
-    <h2>Playlists:</h2>
-    <ul id="playlistList"></ul>
+    <!-- Retrieve section -->
+    <input type="text" id="searchMoodInput" placeholder="Search mood">
+    <button onclick="searchMood()">Retrieve Songs</button>
+
+    <!-- Scrollable list -->
+    <h2>Results:</h2>
+    <div id="resultsContainer" style="max-height: 300px; overflow-y: scroll; border: 1px solid #fff; padding: 10px;">
+        <ul id="playlistList"></ul>
+    </div>
 
     <script>
-        async function fetchPlaylists() {
-            const res = await fetch('/api/playlists');
-            const playlists = await res.json();
-            const list = document.getElementById('playlistList');
-            list.innerHTML = '';
-            playlists.forEach(p => {
-                const li = document.createElement('li');
-                li.textContent = `${p.mood}: ${p.songs.join(', ')}`;
-                list.appendChild(li);
-            });
-        }
-
         async function addPlaylist() {
-            const mood = document.getElementById('moodInput').value;
-            const songs = document.getElementById('songsInput').value.split(',').map(s => s.trim());
+            const mood = document.getElementById('moodInput').value.trim();
+            const song = document.getElementById('songInput').value.trim();
+            if (!mood || !song) return alert('Please enter both mood and song.');
+
             await fetch('/api/playlists', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mood, songs })
+                body: JSON.stringify({ mood, song })
             });
-            fetchPlaylists();
+
+            document.getElementById('moodInput').value = '';
+            document.getElementById('songInput').value = '';
+            alert('Song added!');
         }
 
-        window.onload = fetchPlaylists;
+        async function searchMood() {
+            const mood = document.getElementById('searchMoodInput').value.trim();
+            if (!mood) return alert('Please enter a mood to search.');
+
+            const res = await fetch(`/api/playlists/${mood}`);
+            const entries = await res.json();
+            const list = document.getElementById('playlistList');
+            list.innerHTML = '';
+            entries.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `${entry.mood}: ${entry.song}`;
+                list.appendChild(li);
+            });
+        }
     </script>
 </body>
-</html>

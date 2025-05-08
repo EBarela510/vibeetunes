@@ -6,6 +6,8 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
+
+// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -15,36 +17,41 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     .then(() => console.log('✅ MongoDB connected'))
     .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Playlist schema
+// Mongoose model
 const playlistSchema = new mongoose.Schema({
-    mood: String,
-    songs: [String]
+    mood: { type: String, required: true },
+    song: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
 });
 
-const Playlist = mongoose.model('Playlist', playlistSchema, 'playlists');
+const Playlist = mongoose.model('Playlist', playlistSchema);
 
 // Routes
-app.get('/api/playlists', async (req, res) => {
-    try {
-        const playlists = await Playlist.find();
-        res.json(playlists);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
+// Add mood + song
 app.post('/api/playlists', async (req, res) => {
-    const { mood, songs } = req.body;
+    const { mood, song } = req.body;
+    if (!mood || !song) return res.status(400).json({ error: 'Mood and song are required.' });
     try {
-        const newPlaylist = new Playlist({ mood, songs });
-        await newPlaylist.save();
-        res.json(newPlaylist);
+        const newEntry = new Playlist({ mood, song });
+        await newEntry.save();
+        res.json(newEntry);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Serve frontend
+// Get all songs by mood
+app.get('/api/playlists/:mood', async (req, res) => {
+    try {
+        const entries = await Playlist.find({ mood: req.params.mood });
+        res.json(entries);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Serve index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

@@ -1,107 +1,96 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('❌ MongoDB connection error:', err));
-
-// Import Playlist model
-const Playlist = require('./models/Playlist');
-
-// ROUTES WITH LOGS
-
-// Get playlists by mood
-app.get('/api/playlists/:mood', async (req, res) => {
-    console.log('👉 GET /api/playlists/' + req.params.mood);
-    try {
-        const playlists = await Playlist.find({ mood: req.params.mood });
-        console.log('✅ Found playlists:', playlists);
-        res.json(playlists);
-    } catch (err) {
-        console.error('❌ Error fetching playlists:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Create a new playlist
-app.post('/api/playlists', async (req, res) => {
-    console.log('👉 POST /api/playlists with body:', req.body);
-    const playlist = new Playlist({
-        mood: req.body.mood,
-        songs: req.body.songs
-    });
-    try {
-        const saved = await playlist.save();
-        console.log('✅ Saved to MongoDB:', saved);
-        res.status(201).json(saved);
-    } catch (err) {
-        console.error('❌ Error saving to MongoDB:', err);
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Update playlist by mood
-app.put('/api/playlists/:mood', async (req, res) => {
-    console.log('👉 PUT /api/playlists/' + req.params.mood, 'with body:', req.body);
-    try {
-        const updated = await Playlist.findOneAndUpdate(
-            { mood: req.params.mood },
-            { songs: req.body.songs },
-            { new: true }
-        );
-        if (!updated) {
-            console.log('⚠️ Playlist not found for update');
-            return res.status(404).json({ message: 'Playlist not found' });
-        }
-        console.log('✅ Updated playlist:', updated);
-        res.json(updated);
-    } catch (err) {
-        console.error('❌ Error updating playlist:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Delete playlist by mood
-app.delete('/api/playlists/:mood', async (req, res) => {
-    console.log('👉 DELETE /api/playlists/' + req.params.mood);
-    try {
-        const deleted = await Playlist.findOneAndDelete({ mood: req.params.mood });
-        if (!deleted) {
-            console.log('⚠️ Playlist not found for deletion');
-            return res.status(404).json({ message: 'Playlist not found' });
-        }
-        console.log('✅ Deleted playlist:', deleted);
-        res.json({ message: 'Playlist deleted' });
-    } catch (err) {
-        console.error('❌ Error deleting playlist:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Serve index.html for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
-
 const API_BASE = '';
 
-async function getPlaylists() { /* ... */ }
-async function createPlaylist() { /* ... */ }
-async function updatePlaylist() { /* ... */ }
-async function deletePlaylist() { /* ... */ }
-function showMessage(msg, type = 'success') { /* ... */ }
+function showMessage(msg, type = 'success') {
+    const messageEl = document.getElementById('message');
+    messageEl.textContent = msg;
+    messageEl.className = type;
+    setTimeout(() => messageEl.textContent = '', 3000);
+}
+
+async function getPlaylists() {
+    const mood = document.getElementById('moodSelect').value;
+    if (!mood) return showMessage('Please select a mood.', 'error');
+
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`);
+        const playlists = await res.json();
+        const playlistEl = document.getElementById('playlist');
+        playlistEl.innerHTML = '';
+
+        if (!Array.isArray(playlists) || playlists.length === 0) {
+            playlistEl.innerHTML = '<li>No playlists found for this mood.</li>';
+            return;
+        }
+
+        playlists.forEach(p => {
+            const li = document.createElement('li');
+            li.textContent = `${p.mood.toUpperCase()}: ${p.songs.join(', ')}`;
+            playlistEl.appendChild(li);
+        });
+    } catch (err) {
+        showMessage('Error fetching playlists.', 'error');
+    }
+}
+
+async function createPlaylist() {
+    const mood = document.getElementById('newMood').value;
+    const songs = document.getElementById('newSongs').value.split(',').map(s => s.trim());
+    if (!mood || songs.length === 0) return showMessage('Please enter mood and songs.', 'error');
+
+    const playlistObj = { mood, songs };
+
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(playlistObj)
+        });
+        if (!res.ok) throw new Error('Failed to create playlist');
+        showMessage('Playlist created!');
+        document.getElementById('newMood').value = '';
+        document.getElementById('newSongs').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error creating playlist.', 'error');
+    }
+}
+
+async function updatePlaylist() {
+    const mood = document.getElementById('updateMood').value;
+    const songs = document.getElementById('updateSongs').value.split(',').map(s => s.trim());
+    if (!mood || songs.length === 0) return showMessage('Please enter mood and new songs.', 'error');
+
+    const updateObj = { songs };
+
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateObj)
+        });
+        if (!res.ok) throw new Error('Failed to update playlist');
+        showMessage('Playlist updated!');
+        document.getElementById('updateMood').value = '';
+        document.getElementById('updateSongs').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error updating playlist.', 'error');
+    }
+}
+
+async function deletePlaylist() {
+    const mood = document.getElementById('deleteMood').value;
+    if (!mood) return showMessage('Please enter mood to delete.', 'error');
+
+    try {
+        const res = await fetch(`${API_BASE}/api/playlists/${mood}`, {
+            method: 'DELETE'
+        });
+        if (!res.ok) throw new Error('Failed to delete playlist');
+        showMessage('Playlist deleted!');
+        document.getElementById('deleteMood').value = '';
+        getPlaylists();
+    } catch (err) {
+        showMessage('Error deleting playlist.', 'error');
+    }
+}

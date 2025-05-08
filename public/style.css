@@ -1,69 +1,82 @@
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    color: white;
-    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #84fab0, #8fd3f4);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 30px auto;
     padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
 h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
 }
 
-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
+.subtitle {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.card {
+    background: #f9f9f9;
+    padding: 15px;
+    margin: 15px 0;
     border-radius: 10px;
-    width: 80%;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 input, select, button {
     padding: 10px;
     margin: 5px;
     border-radius: 5px;
-    border: none;
-    font-size: 1em;
+    border: 1px solid #ccc;
+    width: 80%;
+    max-width: 300px;
 }
 
 button {
-    background: white;
-    color: #2575fc;
+    background: #4caf50;
+    color: white;
     cursor: pointer;
-    transition: background 0.3s, color 0.3s;
+    transition: background 0.3s;
 }
 
 button:hover {
-    background: #2575fc;
-    color: white;
+    background: #388e3c;
 }
 
-ul {
-    list-style: none;
+.playlist {
+    list-style-type: none;
     padding: 0;
+    margin-top: 15px;
 }
 
-li {
-    background: rgba(255, 255, 255, 0.2);
+.playlist li {
+    background: #e0f7fa;
     margin: 5px auto;
     padding: 10px;
     border-radius: 5px;
-    max-width: 400px;
+    max-width: 300px;
 }
 
-#message {
-    margin: 10px;
+.message {
+    margin: 10px 0;
     font-weight: bold;
 }
 
-#message.success {
-    color: lightgreen;
+.message.success {
+    color: green;
 }
 
-#message.error {
-    color: pink;
+.message.error {
+    color: red;
 }
